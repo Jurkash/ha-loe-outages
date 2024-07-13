@@ -1,0 +1,11 @@
+{
+  "domain": "loe_outages",
+  "name": "LOE Outages",
+  "codeowners": ["@jurkash"],
+  "config_flow": true,
+  "documentation": "https://github.com/jurkash/ha-loe-outages",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/jurkash/ha-loe-outages",
+  "requirements": ["icalendar>=5.0.12", "recurring_ical_events>=2.2.1"],
+  "version": "0.0.0-unreleased"
+}

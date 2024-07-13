@@ -1,0 +1,76 @@
+{
+    "title": "ЛОЕ Відключення",
+    "config": {
+      "step": {
+        "user": {
+          "title": "Налаштування ЛОЕ Відключення",
+          "description": "Оберіть свою групу:",
+          "data": {
+            "group": "Група"
+          },
+          "data_description": {
+            "group": "Знайдіть свою групу на: https://poweron.loe.lviv.ua/shedule-off"
+          }
+        }
+      }
+    },
+    "options": {
+      "step": {
+        "init": {
+          "title": "Опції LOE Відключення",
+          "description": "Оберіть іншу групу:",
+          "data": {
+            "group": "Група"
+          },
+          "data_description": {
+            "group": "Знайдіть свою групу на: https://poweron.loe.lviv.ua/shedule-off"
+          }
+        }
+      }
+    },
+    "device": {
+      "loe_outages": {
+        "name": "LOE Група {group}"
+      }
+    },
+    "entity": {
+      "calendar": {
+        "calendar": {
+          "name": "Графік відключень",
+          "state_attributes": {
+            "message": {
+              "name": "Підключення",
+              "state": {
+                "off": "Відключення",
+                "maybe": "Можливе відключення"
+              }
+            }
+          }
+        }
+      },
+      "sensor": {
+        "electricity": {
+          "name": "Електрика",
+          "state": {
+            "on": "Заживлено",
+            "off": "Відключення",
+            "maybe": "Можливе відключення"
+          }
+        },
+        "next_outage": {
+          "name": "Наступне відключення"
+        },
+        "next_possible_outage": {
+          "name": "Наступне можливе відключення"
+        },
+        "next_connectivity": {
+          "name": "Наступна заживленість"
+        }
+      }
+    },
+    "common": {
+      "electricity_on": "Заживлено",
+      "electricity_off": "Відключення",
+      "electricity_maybe": "Можливе відключення"
+    }
+  }
