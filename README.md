@@ -1,6 +1,6 @@
 <!-- ![SWUbanner](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct-single.svg)](https://stand-with-ukraine.pp.ua/)
-
-![HA LOE Outages Logo](./icons/logo.svg) -->
+-->
+![HA LOE Outages Logo](./icons/logo.svg) 
 
 # ⚡️ HA LOE Outages
 
@@ -12,59 +12,62 @@
 [![Buy Me A Coffee][buymeacoffee-image]][buymeacoffee-url]
 [![Twitter][twitter-image]][twitter-url]
 
-> An integration for electricity outages plans by [LOE][loe].
+> A Home Assistant integration for monitoring electricity outage schedules by [LOE][loe].
 
-This integration for [Home Assistant][home-assistant] provides information about electricity outages plans by [LOE][loe]: calendar of planned outages, time sensors for the next planned outages, and more.
+This integration for [Home Assistant][home-assistant] offers real-time information on planned electricity outages by [LOE][loe]. It includes a calendar of planned outages, time sensors for the next scheduled outages, and more.
 
-**💡 Note:** This is not affiliated with [LOE][loe] in any way. This integration is developed by an individual. Information may vary from their official website.
+**💡 Note:** This project is independently developed and is not affiliated with [LOE][loe]. The information provided may differ from their official announcements.
 
 ## Sponsorship
 
-Your generosity will help me maintain and develop more projects like this one.
+Your support helps maintain and develop projects like this one. Show your love and support through any of the following:
 
-- 💖 [Sponsor on GitHub][gh-sponsors-url]
 - ☕️ [Buy Me A Coffee][buymeacoffee-url]
 - 🤝 [Support on Patreon][patreon-url]
+- 💖 [Sponsor on GitHub][gh-sponsors-url]
 
 ## Installation
 
-The quickest way to install this integration is via [HACS][hacs-url] by clicking the button below:
+The easiest way to install this integration is via [HACS][hacs-url]. Click the button below to add it:
 
 [![Add to HACS via My Home Assistant][hacs-install-image]][hasc-install-url]
 
-If it doesn't work, adding this repository to HACS manually by adding this URL:
+If the button doesn't work, follow these steps to add the repository manually:
 
-1. Visit **HACS** → **Integrations** → **...** (in the top right) → **Custom repositories**
-1. Click **Add**
-1. Paste `https://github.com/jurakash/ha-loe-outages` into the **URL** field
-1. Chose **Integration** as a **Category**
-1. **LOE Outages** will appear in the list of available integrations. Install it normally.
+1. Go to **HACS** → **Integrations** → **...** (top right) → **Custom repositories**
+2. Click **Add**
+3. Enter `https://github.com/jurakash/ha-loe-outages` in the **URL** field
+4. Choose **Integration** as the **Category**
+5. **LOE Outages** will appear in the list of available integrations. Install it as usual.
+
 <!-- 
 ## Usage
 
-This integration is configurable via UI. On **Devices and Services** page, click **Add Integration** and search for **LOE Outages**.
+This integration can be configured via the UI. On the **Devices and Services** page, click **Add Integration** and search for **LOE Outages**.
 
-Find your group by visiting [LOE][loe] website and typing your address in the search bar. Select your group in the configuration.
+Find your group by visiting the [LOE][loe] website and entering your address in the search bar. Select your group in the configuration.
 
 ![Configuration flow](https://github.com/jurkash/ha-loe-outages/assets/3459374/e8bfde50-fcbe-45c3-b448-b451b0ac3bcd)
 
-Then you can add the integration to your dashboard and see the information about the next planned outages.
+After configuring, add the integration to your dashboard to view the next planned outages.
 
 ![Device page](https://github.com/jurkash/ha-loe-outages/assets/3459374/df628647-fd2a-455d-9d08-0d1542b67e41)
 
-Integration also provides a calendar view of planned outages. You can add it to your dashboard as well via [Calendar card][calendar-card].
+The integration also provides a calendar view of planned outages, which can be added to your dashboard via the [Calendar card][calendar-card].
 
 ![Calendar view](https://github.com/jurkash/ha-loe-outages/assets/3459374/b09c4db3-d0a0-4e06-8dd9-3f4a59f1d63e)
 
-Here's an example of a dashboard using this integration:
+Here’s an example of a dashboard using this integration:
+
 
 ![Dashboard example](https://github.com/jurkash/ha-loe-outages/assets/3459374/26c75595-8984-4a9f-893a-e4b6d838b7f2) -->
 
 <!-- ## Development
 
-Want to contribute to the project?
+Interested in contributing to the project?
 
-First, thanks! Check [contributing guideline](./CONTRIBUTING.md) for more information. -->
+First, thank you! Check out the [contributing guideline](./CONTRIBUTING.md) for more information. -->
+
 
 ## License
 
@@ -73,7 +76,7 @@ MIT © [Yurii Shunkin][jurkash]
 <!-- Badges -->
 
 [gh-release-url]: https://github.com/jurkash/ha-loe-outages/releases/latest
-<!-- [gh-release-image]: https://img.shields.io/github/v/release/jurkash/ha-loe-outages?style=flat-square -->
+[gh-release-image]: https://img.shields.io/github/v/release/jurkash/ha-loe-outages?style=flat-square
 [gh-downloads-url]: https://github.com/jurkash/ha-loe-outages/releases
 [gh-downloads-image]: https://img.shields.io/github/downloads/jurkash/ha-loe-outages/total?style=flat-square
 [hacs-url]: https://github.com/hacs/integration
