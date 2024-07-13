@@ -40,8 +40,9 @@ def build_schema(config_entry: ConfigEntry) -> vol.Schema:
                 {
                     "select": {
                         "options": [
-                            {"value": str(i), "label": f"Group {i}"}
-                            for i in range(1, 7)
+                            {"value": f"{i}.{j}", "label": f"Group {i}.{j}"}
+                            for i in range(1, 4)
+                            for j in range(1, 3)
                         ],
                     },
                 },
