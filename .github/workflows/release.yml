@@ -1,0 +1,37 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: 🏷️ Set manifest version
+        run: python scripts/set_version ${{ github.ref_name }}
+
+      - name: 📦 Create zip package
+        working-directory: custom_components/loe_outages
+        run: zip -r loe-outages.zip .
+
+      - name: 📤  Upload zip to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: custom_components/loe_outages/loe-outages.zip
+          asset_name: loe-outages.zip
+          tag: ${{ github.ref }}
+          overwrite: true
