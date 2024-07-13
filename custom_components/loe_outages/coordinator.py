@@ -158,7 +158,9 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
             return None
 
         event_summary = event.get("state")
-        translated_summary = self.event_name_map.get(event_summary) if translate else event_summary
+        translated_summary = (
+            self.event_name_map.get(event_summary) if translate else event_summary
+        )
         event_start = datetime.datetime.fromisoformat(event["startTime"])
         event_end = datetime.datetime.fromisoformat(event["endTime"])
 
