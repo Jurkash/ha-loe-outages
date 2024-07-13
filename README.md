@@ -59,6 +59,7 @@ The integration also provides a calendar view of planned outages, which can be a
 
 Here’s an example of a dashboard using this integration:
 
+
 ![Dashboard example](https://github.com/jurkash/ha-loe-outages/assets/3459374/26c75595-8984-4a9f-893a-e4b6d838b7f2) -->
 
 <!-- ## Development
@@ -66,6 +67,7 @@ Here’s an example of a dashboard using this integration:
 Interested in contributing to the project?
 
 First, thank you! Check out the [contributing guideline](./CONTRIBUTING.md) for more information. -->
+
 
 ## License
 
