@@ -8,6 +8,7 @@ from .const import API_BASE_URL
 
 LOGGER = logging.getLogger(__name__)
 
+
 class LoeOutagesApi:
     """Class to interact with the API for LOE outages."""
 
@@ -22,9 +23,9 @@ class LoeOutagesApi:
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()
-        for group in data['groups']:
-            if group['id'] == self.group:
-                return group['intervals']
+        for group in data["groups"]:
+            if group["id"] == self.group:
+                return group["intervals"]
         return []
 
     def get_current_event(self, at: datetime.datetime) -> dict:
@@ -32,8 +33,8 @@ class LoeOutagesApi:
         schedule = self.fetch_schedule()
         current_event = None
         for event in schedule:
-            start = datetime.datetime.fromisoformat(event['startTime'])
-            end = datetime.datetime.fromisoformat(event['endTime'])
+            start = datetime.datetime.fromisoformat(event["startTime"])
+            end = datetime.datetime.fromisoformat(event["endTime"])
             if start <= at <= end:
                 current_event = event
                 break
@@ -48,8 +49,8 @@ class LoeOutagesApi:
         schedule = self.fetch_schedule()
         events = []
         for event in schedule:
-            start = datetime.datetime.fromisoformat(event['startTime'])
-            end = datetime.datetime.fromisoformat(event['endTime'])
+            start = datetime.datetime.fromisoformat(event["startTime"])
+            end = datetime.datetime.fromisoformat(event["endTime"])
             if start_date <= start <= end_date or start_date <= end <= end_date:
                 events.append(event)
         return events
