@@ -2,6 +2,7 @@
 
 import datetime
 import logging
+import requests
 
 from homeassistant.components.calendar import CalendarEvent
 from homeassistant.config_entries import ConfigEntry
@@ -14,10 +15,8 @@ from .api import LoeOutagesApi
 from .const import (
     CONF_GROUP,
     DOMAIN,
-    STATE_MAYBE,
     STATE_OFF,
     STATE_ON,
-    TRANSLATION_KEY_EVENT_MAYBE,
     TRANSLATION_KEY_EVENT_OFF,
     UPDATE_INTERVAL,
 )
@@ -52,7 +51,6 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
         """Return a mapping of event names to translations."""
         return {
             STATE_OFF: self.translations.get(TRANSLATION_KEY_EVENT_OFF),
-            STATE_MAYBE: self.translations.get(TRANSLATION_KEY_EVENT_MAYBE),
         }
 
     async def update_config(
@@ -101,27 +99,18 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
         return None
 
     @property
-    def next_possible_outage(self) -> datetime.datetime | None:
-        """Get the next outage time."""
-        next_events = self.get_next_events()
-        for event in next_events:
-            if self._event_to_state(event) == STATE_MAYBE:
-                return event.start
-        return None
-
-    @property
     def next_connectivity(self) -> datetime.datetime | None:
         """Get next connectivity time."""
         now = dt_utils.now()
         current_event = self.get_event_at(now)
-        # If current event is maybe, return the end time
-        if self._event_to_state(current_event) == STATE_MAYBE:
+        # If current event is OFF, return the end time
+        if self._event_to_state(current_event) == STATE_OFF:
             return current_event.end
 
-        # Otherwise, return the next maybe event's end
+        # Otherwise, return the next OFF event's end
         next_events = self.get_next_events()
         for event in next_events:
-            if self._event_to_state(event) == STATE_MAYBE:
+            if self._event_to_state(event) == STATE_OFF:
                 return event.end
         return None
 
@@ -168,10 +157,10 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
         if not event:
             return None
 
-        event_summary = event.get("SUMMARY")
-        translated_summary = self.event_name_map.get(event_summary)
-        event_start = event.decoded("DTSTART")
-        event_end = event.decoded("DTEND")
+        event_summary = event.get("state")
+        translated_summary = self.event_name_map.get(event_summary) if translate else event_summary
+        event_start = datetime.datetime.fromisoformat(event["startTime"])
+        event_end = datetime.datetime.fromisoformat(event["endTime"])
 
         LOGGER.debug(
             "Transforming event: %s (%s -> %s)",
@@ -181,7 +170,7 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
         )
 
         return CalendarEvent(
-            summary=translated_summary if translate else event_summary,
+            summary=translated_summary,
             start=event_start,
             end=event_end,
             description=event_summary,
@@ -191,6 +180,5 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
         summary = event.as_dict().get("summary") if event else None
         return {
             STATE_OFF: STATE_OFF,
-            STATE_MAYBE: STATE_MAYBE,
             None: STATE_ON,
         }[summary]

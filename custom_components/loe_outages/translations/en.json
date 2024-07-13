@@ -41,8 +41,7 @@
             "message": {
               "name": "Connectivity",
               "state": {
-                "off": "Electricity Outage",
-                "maybe": "Possible Outage"
+                "off": "Electricity Outage"
               }
             }
           }
@@ -53,15 +52,11 @@
           "name": "Electricity",
           "state": {
             "on": "Connected",
-            "off": "Outage",
-            "maybe": "Possible Outage"
+            "off": "Outage"
           }
         },
         "next_outage": {
           "name": "Next Outage"
-        },
-        "next_possible_outage": {
-          "name": "Next Possible Outage"
         },
         "next_connectivity": {
           "name": "Next Connectivity"
@@ -70,7 +65,6 @@
     },
     "common": {
       "electricity_on": "Connected",
-      "electricity_off": "Outage",
-      "electricity_maybe": "Possible Outage"
+      "electricity_off": "Outage"
     }
   }

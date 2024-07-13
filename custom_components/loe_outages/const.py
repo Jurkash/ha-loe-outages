@@ -15,10 +15,8 @@ DEFAULT_GROUP: Final = "1.1"
 UPDATE_INTERVAL: Final = 60
 
 # Values
-STATE_ON: Final = "on"
-STATE_OFF: Final = "off"
-STATE_MAYBE: Final = "maybe"
-
+STATE_ON: Final = "PowerOn"
+STATE_OFF: Final = "PowerOff"
 # Endpoint paths
 SCHEDULE_PATH = "https://lps.yuriishunkin.com/api/schedule/latest/{group}"
 API_BASE_URL = "https://lps.yuriishunkin.com/api"
@@ -26,4 +24,3 @@ API_BASE_URL = "https://lps.yuriishunkin.com/api"
 
 # Keys
 TRANSLATION_KEY_EVENT_OFF: Final = f"component.{DOMAIN}.common.electricity_off"
-TRANSLATION_KEY_EVENT_MAYBE: Final = f"component.{DOMAIN}.common.electricity_maybe"

@@ -13,7 +13,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import STATE_MAYBE, STATE_OFF, STATE_ON
+from .const import STATE_OFF, STATE_ON
 from .coordinator import LoeOutagesCoordinator
 from .entity import LoeOutagesEntity
 
@@ -39,7 +39,7 @@ SENSOR_TYPES: tuple[LoeOutagesSensorDescription, ...] = (
         translation_key="electricity",
         icon="mdi:transmission-tower",
         device_class=SensorDeviceClass.ENUM,
-        options=[STATE_ON, STATE_OFF, STATE_MAYBE],
+        options=[STATE_ON, STATE_OFF],
         val_func=lambda coordinator: coordinator.current_state,
     ),
     LoeOutagesSensorDescription(
@@ -48,13 +48,6 @@ SENSOR_TYPES: tuple[LoeOutagesSensorDescription, ...] = (
         icon="mdi:calendar-remove",
         device_class=SensorDeviceClass.TIMESTAMP,
         val_func=lambda coordinator: coordinator.next_outage,
-    ),
-    LoeOutagesSensorDescription(
-        key="next_possible_outage",
-        translation_key="next_possible_outage",
-        icon="mdi:calendar-question",
-        device_class=SensorDeviceClass.TIMESTAMP,
-        val_func=lambda coordinator: coordinator.next_possible_outage,
     ),
     LoeOutagesSensorDescription(
         key="next_connectivity",
