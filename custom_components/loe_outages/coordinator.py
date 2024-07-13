@@ -2,6 +2,7 @@
 
 import datetime
 import logging
+import requests
 
 from homeassistant.components.calendar import CalendarEvent
 from homeassistant.config_entries import ConfigEntry
