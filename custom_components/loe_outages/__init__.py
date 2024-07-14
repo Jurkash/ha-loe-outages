@@ -1,4 +1,4 @@
-"""Init file for LOE Outages integration."""
+"""Init file for Loe Outages integration."""
 
 from __future__ import annotations
 

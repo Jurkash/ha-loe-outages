@@ -1,4 +1,4 @@
-"""LOE Outages entity."""
+"""Loe Outages entity."""
 
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -8,7 +8,7 @@ from .coordinator import LoeOutagesCoordinator
 
 
 class LoeOutagesEntity(CoordinatorEntity[LoeOutagesCoordinator]):
-    """Common logic for LOE Outages entity."""
+    """Common logic for Loe Outages entity."""
 
     _attr_has_entity_name = True
 
@@ -19,6 +19,6 @@ class LoeOutagesEntity(CoordinatorEntity[LoeOutagesCoordinator]):
             translation_key="loe_outages",
             translation_placeholders={"group": self.coordinator.group},
             identifiers={(DOMAIN, self.coordinator.config_entry.entry_id)},
-            manufacturer="LOE",
+            manufacturer="Loe",
             entry_type=DeviceEntryType.SERVICE,
         )

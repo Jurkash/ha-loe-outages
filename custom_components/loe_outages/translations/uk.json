@@ -17,7 +17,7 @@
     "options": {
       "step": {
         "init": {
-          "title": "Опції LOE Відключення",
+          "title": "Опції ЛОЕ Відключення",
           "description": "Оберіть іншу групу:",
           "data": {
             "group": "Група"
@@ -30,7 +30,7 @@
     },
     "device": {
       "loe_outages": {
-        "name": "LOE Група {group}"
+        "name": "ЛОЕ Група {group}"
       }
     },
     "entity": {
@@ -41,7 +41,7 @@
             "message": {
               "name": "Підключення",
               "state": {
-                "off": "Відключення"
+                "PowerOff": "Відключення"
               }
             }
           }
@@ -51,15 +51,15 @@
         "electricity": {
           "name": "Електрика",
           "state": {
-            "on": "Заживлено",
-            "off": "Відключення"
+            "PowerOn": "Заживлено",
+            "PowerOff": "Відключення"
           }
         },
         "next_outage": {
           "name": "Наступне відключення"
         },
         "next_connectivity": {
-          "name": "Наступна заживленість"
+          "name": "Наступне харчування"
         }
       }
     },
