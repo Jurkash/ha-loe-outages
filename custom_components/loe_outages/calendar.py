@@ -53,6 +53,9 @@ class LoeOutagesCalendar(LoeOutagesEntity, CalendarEntity):
         now = dt_utils.now()
         LOGGER.debug("Getting current event for %s", now)
         interval = self.coordinator.get_event_at(now)
+        if not interval:
+            return None
+
         return CalendarEvent(
             summary=interval.state,
             start=interval.startTime,
