@@ -10,6 +10,8 @@
 [![Buy Me A Coffee][buymeacoffee-image]][buymeacoffee-url]
 [![Twitter][twitter-image]][twitter-url]
 
+Inspired by [ha-yasno-outages](https://github.com/denysdovhan/ha-yasno-outages)
+
 > A Home Assistant integration for monitoring electricity outage schedules by [LOE][loe].
 
 This integration for [Home Assistant][home-assistant] offers real-time information on planned electricity outages by [LOE][loe]. It includes a calendar of planned outages, time sensors for the next scheduled outages, and more.
