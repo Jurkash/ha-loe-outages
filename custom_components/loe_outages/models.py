@@ -15,7 +15,7 @@ class Interval:
     @staticmethod
     def from_dict(obj: dict) -> "Interval":
         return Interval(
-            state=obj.get("state"),
+            state=obj.get("state").lower(),
             startTime=parser.parse(obj.get("startTime")).astimezone(utc),
             endTime=parser.parse(obj.get("endTime")).astimezone(utc),
         )

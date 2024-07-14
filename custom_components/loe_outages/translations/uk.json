@@ -41,7 +41,7 @@
             "message": {
               "name": "Підключення",
               "state": {
-                "PowerOff": "Відключення"
+                "poweroff": "Відключення"
               }
             }
           }
@@ -51,8 +51,8 @@
         "electricity": {
           "name": "Електрика",
           "state": {
-            "PowerOn": "Заживлено",
-            "PowerOff": "Відключення"
+            "poweron": "Заживлено",
+            "poweroff": "Відключення"
           }
         },
         "next_outage": {

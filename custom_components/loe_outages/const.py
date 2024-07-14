@@ -15,8 +15,8 @@ DEFAULT_GROUP: Final = "1.1"
 UPDATE_INTERVAL: Final = 60
 
 # Values
-STATE_ON: Final = "PowerOn"
-STATE_OFF: Final = "PowerOff"
+STATE_ON: Final = "poweron"
+STATE_OFF: Final = "poweroff"
 
 # Keys
 TRANSLATION_KEY_EVENT_OFF: Final = f"component.{DOMAIN}.common.electricity_off"
