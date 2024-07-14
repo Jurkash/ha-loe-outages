@@ -58,7 +58,11 @@ class OutageSchedule:
         self.groups = groups
 
     @staticmethod
-    def from_dict(obj: dict) -> "OutageSchedule":
+    def from_list(obj_list: List[dict]) -> List["OutageSchedule"]:
+        return [OutageSchedule.from_dict(item) for item in obj_list]
+
+    @staticmethod
+    def from_dict(obj: dict) -> list["OutageSchedule"]:
         groups = [Group.from_dict(group) for group in obj.get("groups", [])]
         return OutageSchedule(
             id=obj.get("id"),

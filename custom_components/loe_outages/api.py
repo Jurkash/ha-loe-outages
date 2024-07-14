@@ -19,7 +19,7 @@ class LoeOutagesApi:
         self.group = group
         self.schedule = []
 
-    async def async_fetch_json_from_endpoint(self) -> dict:
+    async def async_fetch_latest_json(self) -> dict:
         """Fetch outages from the async API endpoint."""
         url = "https://lps.yuriishunkin.com/api/Schedule/latest"
         async with aiohttp.ClientSession() as session:
@@ -31,18 +31,34 @@ class LoeOutagesApi:
                     LOGGER.error(f"Failed to fetch schedule: {response.status}")
                     return None
 
+    async def async_fetch_all_json(self) -> dict:
+        """Fetch outages from the async API endpoint."""
+        url = "https://lps.yuriishunkin.com/api/Schedule/all"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return data
+                else:
+                    LOGGER.error(f"Failed to fetch schedule: {response.status}")
+                    return None
+
     async def async_fetch_schedule(self) -> None:
         """Fetch outages from the JSON response."""
-        schedule_data = await self.async_fetch_json_from_endpoint()
-        schedule = OutageSchedule.from_dict(schedule_data)
         if len(self.schedule) == 0:
-            self.schedule.append(schedule)
+            schedule_data = await self.async_fetch_all_json()
+            schedules = OutageSchedule.from_list(schedule_data)
+            for schedule in sorted(schedules, key=lambda s: s.date):
+                self.schedule.append(schedule)
             return
+        else:
+            schedule_data = await self.async_fetch_latest_json()
+            schedule = OutageSchedule.from_dict(schedule_data)
 
-        if self.schedule[-1].id != schedule.id:
-            if self.schedule[-1].dateString == schedule.dateString:
-                self.schedule.remove(self.schedule[-1])
-            self.schedule.append(schedule)
+            if self.schedule[-1].id != schedule.id:
+                if self.schedule[-1].dateString == schedule.dateString:
+                    self.schedule.remove(self.schedule[-1])
+                self.schedule.append(schedule)
 
     def get_current_event(self, at: datetime) -> dict:
         """Get the current event."""
