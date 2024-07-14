@@ -1,4 +1,4 @@
-"""Calendar platform for LOE outages integration."""
+"""Calendar platform for Loe outages integration."""
 
 import logging
 from collections.abc import Callable
@@ -22,7 +22,7 @@ LOGGER = logging.getLogger(__name__)
 
 @dataclass(frozen=True, kw_only=True)
 class LoeOutagesSensorDescription(SensorEntityDescription):
-    """LOE Outages entity description."""
+    """Loe Outages entity description."""
 
     val_func: Callable[[LoeOutagesCoordinator], bool]
 
@@ -64,7 +64,7 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up the LOE outages calendar platform."""
+    """Set up the Loe outages calendar platform."""
     LOGGER.debug("Setup new entry: %s", config_entry)
     coordinator: LoeOutagesCoordinator = config_entry.runtime_data
     async_add_entities(

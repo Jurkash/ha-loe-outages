@@ -41,7 +41,7 @@
             "message": {
               "name": "Connectivity",
               "state": {
-                "off": "Electricity Outage"
+                "poweroff": "Electricity Outage"
               }
             }
           }
@@ -51,8 +51,8 @@
         "electricity": {
           "name": "Electricity",
           "state": {
-            "on": "Connected",
-            "off": "Outage"
+            "poweron": "Connected",
+            "poweroff": "Outage"
           }
         },
         "next_outage": {

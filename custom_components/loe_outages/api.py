@@ -1,56 +1,80 @@
-"""API for LOE outages."""
+"""API for Loe outages."""
 
-import datetime
 import logging
-import requests
-
-from .const import API_BASE_URL
+import aiohttp
+from .models import OutageSchedule
+import datetime
+import pytz
 
 LOGGER = logging.getLogger(__name__)
 
 
 class LoeOutagesApi:
-    """Class to interact with the API for LOE outages."""
+    """Class to interact with API for Loe outages."""
+
+    schedule: list[OutageSchedule]
 
     def __init__(self, group: str) -> None:
-        """Initialize the LOE OutagesApi."""
+        """Initialize the LoeOutagesApi."""
         self.group = group
-        self.api_base_url = API_BASE_URL
+        self.schedule = []
 
-    def fetch_schedule(self) -> list[dict]:
-        """Fetch outages from the API."""
-        url = f"{self.api_base_url}/Schedule/latest"
-        response = requests.get(url)
-        response.raise_for_status()
-        data = response.json()
-        for group in data["groups"]:
-            if group["id"] == self.group:
-                return group["intervals"]
-        return []
+    async def async_fetch_json_from_endpoint(self) -> dict:
+        """Fetch outages from the async API endpoint."""
+        url = "https://lps.yuriishunkin.com/api/Schedule/latest"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return data
+                else:
+                    LOGGER.error(f"Failed to fetch schedule: {response.status}")
+                    return None
 
-    def get_current_event(self, at: datetime.datetime) -> dict:
+    async def async_fetch_schedule(self) -> None:
+        """Fetch outages from the JSON response."""
+        schedule_data = await self.async_fetch_json_from_endpoint()
+        schedule = OutageSchedule.from_dict(schedule_data)
+        if len(self.schedule) == 0:
+            self.schedule.append(schedule)
+            return
+
+        if self.schedule[-1].id != schedule.id:
+            if self.schedule[-1].dateString == schedule.dateString:
+                self.schedule.remove(self.schedule[-1])
+            self.schedule.append(schedule)
+
+    def get_current_event(self, at: datetime) -> dict:
         """Get the current event."""
-        schedule = self.fetch_schedule()
-        current_event = None
-        for event in schedule:
-            start = datetime.datetime.fromisoformat(event["startTime"])
-            end = datetime.datetime.fromisoformat(event["endTime"])
-            if start <= at <= end:
-                current_event = event
-                break
-        return current_event
+        if not self.schedule:
+            return None
+
+        twoDaysBefore = datetime.datetime.now() + datetime.timedelta(days=-2)
+        for schedule in reversed(self.schedule):
+            if schedule.date < twoDaysBefore.astimezone(pytz.UTC):
+                return None
+
+            events_at = schedule.get_current_event(self.group, at)
+            if not events_at:
+                return None
+            return events_at  # return only the first event
 
     def get_events(
         self,
         start_date: datetime.datetime,
         end_date: datetime.datetime,
     ) -> list[dict]:
-        """Get all events between start_date and end_date."""
-        schedule = self.fetch_schedule()
-        events = []
-        for event in schedule:
-            start = datetime.datetime.fromisoformat(event["startTime"])
-            end = datetime.datetime.fromisoformat(event["endTime"])
-            if start_date <= start <= end_date or start_date <= end <= end_date:
-                events.append(event)
-        return events
+        """Get all events."""
+        if not self.schedule:
+            return []
+
+        result = []
+        twoDaysBeforeStart = start_date + datetime.timedelta(days=-2)
+        for schedule in reversed(self.schedule):
+            if schedule.date < twoDaysBeforeStart:
+                break
+
+            for interval in schedule.between(self.group, start_date, end_date):
+                result.append(interval)
+
+        return result

@@ -1,10 +1,9 @@
-"""Coordinator for LOE outages integration."""
+"""Coordinator for Loe outages integration."""
 
 import datetime
 import logging
-import requests
 
-from homeassistant.components.calendar import CalendarEvent
+from .models import Interval
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.translation import async_get_translations
@@ -18,14 +17,17 @@ from .const import (
     STATE_OFF,
     STATE_ON,
     TRANSLATION_KEY_EVENT_OFF,
+    TRANSLATION_KEY_EVENT_ON,
     UPDATE_INTERVAL,
 )
 
 LOGGER = logging.getLogger(__name__)
 
+TIMEFRAME_TO_CHECK = datetime.timedelta(hours=24)
+
 
 class LoeOutagesCoordinator(DataUpdateCoordinator):
-    """Class to manage fetching LOE outages data."""
+    """Class to manage fetching Loe outages data."""
 
     config_entry: ConfigEntry
 
@@ -51,6 +53,7 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
         """Return a mapping of event names to translations."""
         return {
             STATE_OFF: self.translations.get(TRANSLATION_KEY_EVENT_OFF),
+            STATE_ON: self.translations.get(TRANSLATION_KEY_EVENT_ON),
         }
 
     async def update_config(
@@ -69,13 +72,13 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
             LOGGER.debug("No group update necessary.")
 
     async def _async_update_data(self) -> None:
-        """Fetch data from the API."""
+        """Fetch data from API."""
         try:
-            # Fetch the schedule data from the API
-            return await self.hass.async_add_executor_job(self.api.fetch_schedule)
-        except requests.RequestException as err:
-            LOGGER.exception("Error fetching data for group %s", self.group)
-            msg = f"Error fetching data from API: {err}"
+            await self.async_fetch_translations()
+            return await self.api.async_fetch_schedule()
+        except FileNotFoundError as err:
+            LOGGER.exception("Cannot read file for group %s", self.group)
+            msg = f"File not found: {err}"
             raise UpdateFailed(msg) from err
 
     async def async_fetch_translations(self) -> None:
@@ -89,14 +92,30 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
         )
         LOGGER.debug("Translations loaded: %s", self.translations)
 
+    def _get_next_event_of_type(self, state_type: str) -> Interval | None:
+        """Get the next event of a specific type."""
+        now = dt_utils.now()
+        # Sort events to handle multi-day spanning events correctly
+        next_events = sorted(
+            self.get_events_between(
+                now,
+                now + TIMEFRAME_TO_CHECK,
+                translate=False,
+            ),
+            key=lambda event: event.startTime,
+        )
+        LOGGER.debug("Next events: %s", next_events)
+        for event in next_events:
+            if self._event_to_state(event) == state_type and event.startTime > now:
+                return event
+        return None
+
     @property
     def next_outage(self) -> datetime.datetime | None:
         """Get the next outage time."""
-        next_events = self.get_next_events()
-        for event in next_events:
-            if self._event_to_state(event) == STATE_OFF:
-                return event.start
-        return None
+        event = self._get_next_event_of_type(STATE_OFF)
+        LOGGER.debug("Next outage: %s", event)
+        return event.startTime if event else None
 
     @property
     def next_connectivity(self) -> datetime.datetime | None:
@@ -105,14 +124,12 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
         current_event = self.get_event_at(now)
         # If current event is OFF, return the end time
         if self._event_to_state(current_event) == STATE_OFF:
-            return current_event.end
+            return current_event.endTime
 
-        # Otherwise, return the next OFF event's end
-        next_events = self.get_next_events()
-        for event in next_events:
-            if self._event_to_state(event) == STATE_OFF:
-                return event.end
-        return None
+        # Otherwise, return the next on event's end
+        event = self._get_next_event_of_type(STATE_ON)
+        LOGGER.debug("Next connectivity: %s", event)
+        return event.startTime if event else None
 
     @property
     def current_state(self) -> str:
@@ -121,7 +138,7 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
         event = self.get_event_at(now)
         return self._event_to_state(event)
 
-    def get_event_at(self, at: datetime.datetime) -> CalendarEvent:
+    def get_event_at(self, at: datetime.datetime) -> Interval:
         """Get the current event."""
         event = self.api.get_current_event(at)
         return self._get_calendar_event(event, translate=False)
@@ -132,37 +149,27 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
         end_date: datetime.datetime,
         *,
         translate: bool = True,
-    ) -> list[CalendarEvent]:
+    ) -> list[Interval]:
         """Get all events."""
         events = self.api.get_events(start_date, end_date)
         return [
             self._get_calendar_event(event, translate=translate) for event in events
         ]
 
-    def get_next_events(self) -> CalendarEvent:
-        """Get the next event of a specific type."""
-        now = dt_utils.now()
-        current_event = self.get_event_at(now)
-        start = current_event.end if current_event else now
-        end = start + datetime.timedelta(days=1)
-        return self.get_events_between(start, end, translate=False)
-
     def _get_calendar_event(
         self,
         event: dict | None,
         *,
         translate: bool = True,
-    ) -> CalendarEvent:
-        """Transform an event into a CalendarEvent."""
+    ) -> Interval:
+        """Transform an event into a Inteval."""
         if not event:
             return None
 
-        event_summary = event.get("state")
-        translated_summary = (
-            self.event_name_map.get(event_summary) if translate else event_summary
-        )
-        event_start = datetime.datetime.fromisoformat(event["startTime"])
-        event_end = datetime.datetime.fromisoformat(event["endTime"])
+        event_summary = event["state"]
+        translated_summary = self.event_name_map.get(event_summary)
+        event_start = event["startTime"]
+        event_end = event["endTime"]
 
         LOGGER.debug(
             "Transforming event: %s (%s -> %s)",
@@ -171,16 +178,16 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
             event_end,
         )
 
-        return CalendarEvent(
-            summary=translated_summary,
-            start=event_start,
-            end=event_end,
-            description=event_summary,
+        return Interval(
+            state=translated_summary if translate else event_summary,
+            startTime=event_start,
+            endTime=event_end,
         )
 
-    def _event_to_state(self, event: CalendarEvent | None) -> str:
-        summary = event.as_dict().get("summary") if event else None
+    def _event_to_state(self, event: Interval | None) -> str:
+        state = event.state if event else None
         return {
+            STATE_ON: STATE_ON,
             STATE_OFF: STATE_OFF,
             None: STATE_ON,
-        }[summary]
+        }[state]

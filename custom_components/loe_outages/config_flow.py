@@ -1,4 +1,4 @@
-"""Config flow for LOE Outages integration."""
+"""Config flow for Loe Outages integration."""
 
 import logging
 from typing import Any
@@ -52,7 +52,7 @@ def build_schema(config_entry: ConfigEntry) -> vol.Schema:
 
 
 class LoeOutagesOptionsFlow(OptionsFlow):
-    """Handle options flow for LOE Outages."""
+    """Handle options flow for Loe Outages."""
 
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialize options flow."""
@@ -71,7 +71,7 @@ class LoeOutagesOptionsFlow(OptionsFlow):
 
 
 class LoeOutagesConfigFlow(ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for LOE Outages."""
+    """Handle a config flow for Loe Outages."""
 
     VERSION = 1
 

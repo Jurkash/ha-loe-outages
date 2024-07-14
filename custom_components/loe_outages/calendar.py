@@ -1,4 +1,4 @@
-"""Calendar platform for LOE outages integration."""
+"""Calendar platform for Loe outages integration."""
 
 import datetime
 import logging
@@ -21,7 +21,7 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up the LOE outages calendar platform."""
+    """Set up the Loe outages calendar platform."""
     LOGGER.debug("Setup new entry: %s", config_entry)
     coordinator: LoeOutagesCoordinator = config_entry.runtime_data
     async_add_entities([LoeOutagesCalendar(coordinator)])
@@ -52,7 +52,13 @@ class LoeOutagesCalendar(LoeOutagesEntity, CalendarEntity):
         """Return the current or next upcoming event or None."""
         now = dt_utils.now()
         LOGGER.debug("Getting current event for %s", now)
-        return self.coordinator.get_event_at(now)
+        interval = self.coordinator.get_event_at(now)
+        return CalendarEvent(
+            summary=interval.state,
+            start=interval.startTime,
+            end=interval.endTime,
+            description=interval.state,
+        )
 
     async def async_get_events(
         self,
@@ -62,4 +68,15 @@ class LoeOutagesCalendar(LoeOutagesEntity, CalendarEntity):
     ) -> list[CalendarEvent]:
         """Return calendar events within a datetime range."""
         LOGGER.debug('Getting all events between "%s" -> "%s"', start_date, end_date)
-        return self.coordinator.get_events_between(start_date, end_date)
+        intervals = self.coordinator.get_events_between(start_date, end_date)
+        events = []
+
+        for interval in intervals:
+            event = CalendarEvent(
+                summary=interval.state,
+                start=interval.startTime,
+                end=interval.endTime,
+                description=interval.state,
+            )
+            events.append(event)
+        return events
