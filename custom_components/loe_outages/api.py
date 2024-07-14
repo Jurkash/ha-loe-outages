@@ -48,12 +48,12 @@ class LoeOutagesApi:
         """Get the current event."""
         if not self.schedule:
             return None
-        
+
         twoDaysBefore = datetime.datetime.now() + datetime.timedelta(days=-2)
         for schedule in reversed(self.schedule):
             if schedule.date < twoDaysBefore.astimezone(pytz.UTC):
                 return None
-            
+
             events_at = schedule.get_current_event(self.group, at)
             if not events_at:
                 return None
@@ -67,7 +67,7 @@ class LoeOutagesApi:
         """Get all events."""
         if not self.schedule:
             return []
-        
+
         result = []
         twoDaysBeforeStart = start_date + datetime.timedelta(days=-2)
         for schedule in reversed(self.schedule):
@@ -76,7 +76,5 @@ class LoeOutagesApi:
 
             for interval in schedule.between(self.group, start_date, end_date):
                 result.append(interval)
-        
+
         return result
-    
-   

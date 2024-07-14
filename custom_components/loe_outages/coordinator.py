@@ -53,7 +53,7 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
         """Return a mapping of event names to translations."""
         return {
             STATE_OFF: self.translations.get(TRANSLATION_KEY_EVENT_OFF),
-            STATE_ON: self.translations.get(TRANSLATION_KEY_EVENT_ON)
+            STATE_ON: self.translations.get(TRANSLATION_KEY_EVENT_ON),
         }
 
     async def update_config(
@@ -166,10 +166,10 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
         if not event:
             return None
 
-        event_summary = event['state']
+        event_summary = event["state"]
         translated_summary = self.event_name_map.get(event_summary)
-        event_start = event['startTime']
-        event_end = event['endTime']
+        event_start = event["startTime"]
+        event_end = event["endTime"]
 
         LOGGER.debug(
             "Transforming event: %s (%s -> %s)",

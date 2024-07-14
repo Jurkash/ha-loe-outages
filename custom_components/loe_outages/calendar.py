@@ -69,10 +69,10 @@ class LoeOutagesCalendar(LoeOutagesEntity, CalendarEntity):
         """Return calendar events within a datetime range."""
         LOGGER.debug('Getting all events between "%s" -> "%s"', start_date, end_date)
         intervals = self.coordinator.get_events_between(start_date, end_date)
-        events = [] 
-        
+        events = []
+
         for interval in intervals:
-            event =  CalendarEvent(
+            event = CalendarEvent(
                 summary=interval.state,
                 start=interval.startTime,
                 end=interval.endTime,
