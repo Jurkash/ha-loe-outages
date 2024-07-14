@@ -1,6 +1,6 @@
 ![HA LOE Outages Logo](./icons/logo.svg) 
 
-# ⚡️ HA LOE Outages
+# 🔌 HA LOE Outages
 
 [![GitHub Release][gh-release-image]][gh-release-url]
 [![GitHub Downloads][gh-downloads-image]][gh-downloads-url]
