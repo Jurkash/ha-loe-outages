@@ -55,10 +55,16 @@ class LoeOutagesApi:
             schedule_data = await self.async_fetch_latest_json()
             schedule = OutageSchedule.from_dict(schedule_data)
 
-            if self.schedule[-1].id != schedule.id:
-                if self.schedule[-1].dateString == schedule.dateString:
-                    self.schedule.remove(self.schedule[-1])
-                self.schedule.append(schedule)
+            new_schedule = OutageSchedule.from_dict(schedule_data)
+            self.schedule = [
+                item
+                for item in self.schedule
+                if item.dateString != new_schedule.dateString
+            ]
+            self.schedule.append(new_schedule)
+            self.schedule.sort(key=lambda item: item.dateString)
+
+        self.schedule = sorted(self.schedule, key=lambda s: s.date)
 
     def get_current_event(self, at: datetime) -> dict:
         """Get the current event."""
