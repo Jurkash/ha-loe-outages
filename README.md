@@ -24,7 +24,6 @@ Your support helps maintain and develop projects like this one. Show your love a
 
 - ☕️ [Buy Me A Coffee][buymeacoffee-url]
 - 🤝 [Support on Patreon][patreon-url]
-- 💖 [Sponsor on GitHub][gh-sponsors-url]
 
 ## Installation
 
