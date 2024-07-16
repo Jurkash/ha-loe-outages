@@ -1,70 +1,70 @@
 {
-    "title": "ЛОЕ Відключення",
-    "config": {
-      "step": {
-        "user": {
-          "title": "Налаштування ЛОЕ Відключення",
-          "description": "Оберіть свою групу:",
-          "data": {
-            "group": "Група"
-          },
-          "data_description": {
-            "group": "Знайдіть свою групу на: https://poweron.loe.lviv.ua/shedule-off"
-          }
+  "title": "ЛОЕ Відключення",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Налаштування ЛОЕ Відключення",
+        "description": "Оберіть свою групу:",
+        "data": {
+          "group": "Група"
+        },
+        "data_description": {
+          "group": "Знайдіть свою групу на: https://poweron.loe.lviv.ua/shedule-off"
         }
       }
-    },
-    "options": {
-      "step": {
-        "init": {
-          "title": "Опції ЛОЕ Відключення",
-          "description": "Оберіть іншу групу:",
-          "data": {
-            "group": "Група"
-          },
-          "data_description": {
-            "group": "Знайдіть свою групу на: https://poweron.loe.lviv.ua/shedule-off"
-          }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Опції ЛОЕ Відключення",
+        "description": "Оберіть іншу групу:",
+        "data": {
+          "group": "Група"
+        },
+        "data_description": {
+          "group": "Знайдіть свою групу на: https://poweron.loe.lviv.ua/shedule-off"
         }
       }
-    },
-    "device": {
-      "loe_outages": {
-        "name": "ЛОЕ Група {group}"
-      }
-    },
-    "entity": {
+    }
+  },
+  "device": {
+    "loe_outages": {
+      "name": "ЛОЕ Група {group}"
+    }
+  },
+  "entity": {
+    "calendar": {
       "calendar": {
-        "calendar": {
-          "name": "Графік відключень",
-          "state_attributes": {
-            "message": {
-              "name": "Підключення",
-              "state": {
-                "poweroff": "Відключення"
-              }
+        "name": "Графік відключень",
+        "state_attributes": {
+          "message": {
+            "name": "Підключення",
+            "state": {
+              "poweroff": "Відключення"
             }
           }
         }
-      },
-      "sensor": {
-        "electricity": {
-          "name": "Електрика",
-          "state": {
-            "poweron": "Заживлено",
-            "poweroff": "Відключення"
-          }
-        },
-        "next_outage": {
-          "name": "Наступне відключення"
-        },
-        "next_connectivity": {
-          "name": "Наступне харчування"
-        }
       }
     },
-    "common": {
-      "electricity_on": "Заживлено",
-      "electricity_off": "Відключення"
+    "sensor": {
+      "electricity": {
+        "name": "Електрика",
+        "state": {
+          "poweron": "Заживлено",
+          "poweroff": "Відключення"
+        }
+      },
+      "next_outage": {
+        "name": "Наступне відключення"
+      },
+      "next_connectivity": {
+        "name": "Наступне заживлення"
+      }
     }
+  },
+  "common": {
+    "electricity_on": "Заживлено",
+    "electricity_off": "Відключення"
   }
+}
