@@ -76,7 +76,7 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
         """Fetch data from API."""
         try:
             await self.async_fetch_translations()
-            return await self.api.async_fetch_schedule()
+            return await self.api.async_fetch_schedules()
         except FileNotFoundError as err:
             LOGGER.exception("Cannot read file for group %s", self.group)
             msg = f"File not found: {err}"

@@ -7,7 +7,7 @@ utc = pytz.UTC
 
 
 class Interval:
-    def __init__(self, state: str, startTime: str, endTime: str):
+    def __init__(self, state: str, startTime: datetime, endTime: datetime):
         self.state = state
         self.startTime = startTime
         self.endTime = endTime
@@ -49,7 +49,12 @@ class Group:
 
 class OutageSchedule:
     def __init__(
-        self, id: str, date: str, dateString: str, imageUrl: str, groups: List[Group]
+        self,
+        id: str,
+        date: datetime,
+        dateString: str,
+        imageUrl: str,
+        groups: List[Group],
     ):
         self.id = id
         self.date = date
