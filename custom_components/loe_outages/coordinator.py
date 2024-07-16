@@ -2,6 +2,7 @@
 
 import datetime
 import logging
+import pytz
 
 from .models import Interval
 from homeassistant.components.calendar import CalendarEvent
@@ -98,7 +99,7 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
         now = dt_utils.now()
         # Sort events to handle multi-day spanning events correctly
         next_events = sorted(
-            self.get_events_between(
+            self.get_intervals_between(
                 now,
                 now + TIMEFRAME_TO_CHECK,
                 translate=False,
@@ -122,7 +123,7 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
     def next_connectivity(self) -> datetime.datetime | None:
         """Get next connectivity time."""
         now = dt_utils.now()
-        current_event = self.get_event_at(now)
+        current_event = self.get_interval_at(now)
         # If current event is OFF, return the end time
         if self._event_to_state(current_event) == STATE_OFF:
             return current_event.endTime
@@ -136,15 +137,15 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
     def current_state(self) -> str:
         """Get the current state."""
         now = dt_utils.now()
-        event = self.get_event_at(now)
+        event = self.get_interval_at(now)
         return self._event_to_state(event)
 
-    def get_event_at(self, at: datetime.datetime) -> Interval:
+    def get_interval_at(self, at: datetime.datetime) -> Interval:
         """Get the current event."""
         event = self.api.get_current_event(at)
         return self._get_interval_event(event, translate=False)
 
-    def get_events_between(
+    def get_intervals_between(
         self,
         start_date: datetime.datetime,
         end_date: datetime.datetime,
@@ -155,24 +156,6 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
         events = self.api.get_events(start_date, end_date)
         return [
             self._get_interval_event(event, translate=translate) for event in events
-        ]
-
-    def get_calendar_at(self, at: datetime.datetime) -> CalendarEvent:
-        """Get the current event."""
-        event = self.api.get_current_event(at)
-        return self._get_calendar_event(event, translate=False)
-
-    def get_calendar_between(
-        self,
-        start_date: datetime.datetime,
-        end_date: datetime.datetime,
-        *,
-        translate: bool = True,
-    ) -> list[CalendarEvent]:
-        """Get all events."""
-        events = self.api.get_events(start_date, end_date)
-        return [
-            self._get_calendar_event(event, translate=translate) for event in events
         ]
 
     def _get_interval_event(
@@ -203,6 +186,24 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
             endTime=event_end,
         )
 
+    def get_calendar_at(self, at: datetime.datetime) -> CalendarEvent:
+        """Get the current event."""
+        event = self.api.get_current_event(at)
+        return self._get_calendar_event(event, translate=False)
+
+    def get_calendar_between(
+        self,
+        start_date: datetime.datetime,
+        end_date: datetime.datetime,
+        *,
+        translate: bool = True,
+    ) -> list[CalendarEvent]:
+        """Get all events."""
+        events = self.api.get_events(start_date, end_date)
+        return [
+            self._get_calendar_event(event, translate=translate) for event in events
+        ]
+
     def _get_calendar_event(
         self,
         event: dict | None,
@@ -213,10 +214,11 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
         if not event:
             return None
 
+        local_tz = pytz.timezone("Europe/Kyiv")
         event_summary = event["state"]
         translated_summary = self.event_name_map.get(event_summary)
-        event_start = dt_utils.as_local(event["startTime"])
-        event_end = dt_utils.as_local(event["endTime"])
+        event_start = event["startTime"].astimezone(local_tz)
+        event_end = event["endTime"].astimezone(local_tz)
 
         LOGGER.debug(
             "Transforming event: %s (%s -> %s)",
