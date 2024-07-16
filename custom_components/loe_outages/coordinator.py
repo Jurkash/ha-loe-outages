@@ -4,6 +4,7 @@ import datetime
 import logging
 
 from .models import Interval
+from homeassistant.components.calendar import CalendarEvent
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.translation import async_get_translations
@@ -141,7 +142,7 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
     def get_event_at(self, at: datetime.datetime) -> Interval:
         """Get the current event."""
         event = self.api.get_current_event(at)
-        return self._get_calendar_event(event, translate=False)
+        return self._get_interval_event(event, translate=False)
 
     def get_events_between(
         self,
@@ -153,10 +154,28 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
         """Get all events."""
         events = self.api.get_events(start_date, end_date)
         return [
+            self._get_interval_event(event, translate=translate) for event in events
+        ]
+
+    def get_calendar_at(self, at: datetime.datetime) -> CalendarEvent:
+        """Get the current event."""
+        event = self.api.get_current_event(at)
+        return self._get_calendar_event(event, translate=False)
+
+    def get_calendar_between(
+        self,
+        start_date: datetime.datetime,
+        end_date: datetime.datetime,
+        *,
+        translate: bool = True,
+    ) -> list[CalendarEvent]:
+        """Get all events."""
+        events = self.api.get_events(start_date, end_date)
+        return [
             self._get_calendar_event(event, translate=translate) for event in events
         ]
 
-    def _get_calendar_event(
+    def _get_interval_event(
         self,
         event: dict | None,
         *,
@@ -182,6 +201,35 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
             state=translated_summary if translate else event_summary,
             startTime=event_start,
             endTime=event_end,
+        )
+
+    def _get_calendar_event(
+        self,
+        event: dict | None,
+        *,
+        translate: bool = True,
+    ) -> CalendarEvent:
+        """Transform an event into a Inteval."""
+        if not event:
+            return None
+
+        event_summary = event["state"]
+        translated_summary = self.event_name_map.get(event_summary)
+        event_start = dt_utils.as_local(event["startTime"])
+        event_end = dt_utils.as_local(event["endTime"])
+
+        LOGGER.debug(
+            "Transforming event: %s (%s -> %s)",
+            event_summary,
+            event_start,
+            event_end,
+        )
+
+        return CalendarEvent(
+            summary=translated_summary if translate else event_summary,
+            start=event_start,
+            end=event_end,
+            description=event_summary,
         )
 
     def _event_to_state(self, event: Interval | None) -> str:

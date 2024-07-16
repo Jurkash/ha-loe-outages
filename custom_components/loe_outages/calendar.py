@@ -52,16 +52,7 @@ class LoeOutagesCalendar(LoeOutagesEntity, CalendarEntity):
         """Return the current or next upcoming event or None."""
         now = dt_utils.now()
         LOGGER.debug("Getting current event for %s", now)
-        interval = self.coordinator.get_event_at(now)
-        if not interval:
-            return None
-
-        return CalendarEvent(
-            summary=interval.state,
-            start=interval.startTime,
-            end=interval.endTime,
-            description=interval.state,
-        )
+        return self.coordinator.get_calendar_at(now)
 
     async def async_get_events(
         self,
@@ -71,14 +62,4 @@ class LoeOutagesCalendar(LoeOutagesEntity, CalendarEntity):
     ) -> list[CalendarEvent]:
         """Return calendar events within a datetime range."""
         LOGGER.debug('Getting all events between "%s" -> "%s"', start_date, end_date)
-        intervals = self.coordinator.get_events_between(start_date, end_date)
-
-        return [
-            CalendarEvent(
-                summary=interval.state,
-                start=interval.startTime,
-                end=interval.endTime,
-                description=interval.state,
-            )
-            for interval in intervals
-        ]
+        return self.coordinator.get_calendar_between(start_date, end_date)
