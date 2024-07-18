@@ -1,6 +1,6 @@
 ![HA LOE Outages Logo](./icons/logo.svg) 
 
-# ⚡️ HA LOE Outages
+# 🔌 HA LOE Outages
 
 [![GitHub Release][gh-release-image]][gh-release-url]
 [![GitHub Downloads][gh-downloads-image]][gh-downloads-url]
@@ -9,6 +9,8 @@
 [![Patreon][patreon-image]][patreon-url]
 [![Buy Me A Coffee][buymeacoffee-image]][buymeacoffee-url]
 [![Twitter][twitter-image]][twitter-url]
+
+Inspired by [ha-yasno-outages](https://github.com/denysdovhan/ha-yasno-outages)
 
 > A Home Assistant integration for monitoring electricity outage schedules by [LOE][loe].
 
@@ -22,7 +24,6 @@ Your support helps maintain and develop projects like this one. Show your love a
 
 - ☕️ [Buy Me A Coffee][buymeacoffee-url]
 - 🤝 [Support on Patreon][patreon-url]
-- 💖 [Sponsor on GitHub][gh-sponsors-url]
 
 ## Installation
 
