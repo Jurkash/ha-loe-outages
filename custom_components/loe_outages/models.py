@@ -1,13 +1,15 @@
 import datetime
 import pytz
-from dateutil import parser
-from typing import List
+import logging
 
 utc = pytz.UTC
+LOGGER = logging.getLogger(__name__)
 
 
 class Interval:
-    def __init__(self, state: str, startTime: datetime, endTime: datetime):
+    def __init__(
+        self, state: str, startTime: datetime.datetime, endTime: datetime.datetime
+    ):
         self.state = state
         self.startTime = startTime
         self.endTime = endTime
@@ -16,8 +18,10 @@ class Interval:
     def from_dict(obj: dict) -> "Interval":
         return Interval(
             state=obj.get("state").lower(),
-            startTime=parser.parse(obj.get("startTime")).astimezone(utc),
-            endTime=parser.parse(obj.get("endTime")).astimezone(utc),
+            startTime=datetime.datetime.fromisoformat(obj.get("startTime")).astimezone(
+                utc
+            ),
+            endTime=datetime.datetime.fromisoformat(obj.get("endTime")).astimezone(utc),
         )
 
     def to_dict(self) -> dict:
@@ -29,7 +33,7 @@ class Interval:
 
 
 class Group:
-    def __init__(self, id: str, intervals: List[Interval]):
+    def __init__(self, id: str, intervals: list[Interval]):
         self.id = id
         self.intervals = intervals
 
@@ -51,10 +55,10 @@ class OutageSchedule:
     def __init__(
         self,
         id: str,
-        date: datetime,
+        date: datetime.datetime,
         dateString: str,
         imageUrl: str,
-        groups: List[Group],
+        groups: list[Group],
     ):
         self.id = id
         self.date = date
@@ -63,15 +67,15 @@ class OutageSchedule:
         self.groups = groups
 
     @staticmethod
-    def from_list(obj_list: List[dict]) -> List["OutageSchedule"]:
+    def from_list(obj_list: list[dict]) -> list["OutageSchedule"]:
         return [OutageSchedule.from_dict(item) for item in obj_list]
 
     @staticmethod
-    def from_dict(obj: dict) -> list["OutageSchedule"]:
+    def from_dict(obj: dict) -> "OutageSchedule":
         groups = [Group.from_dict(group) for group in obj.get("groups", [])]
         return OutageSchedule(
             id=obj.get("id"),
-            date=parser.parse(obj.get("date")).astimezone(utc),
+            date=datetime.datetime.fromisoformat(obj.get("date")).astimezone(utc),
             dateString=obj.get("dateString"),
             imageUrl=obj.get("imageUrl"),
             groups=groups,
@@ -86,24 +90,26 @@ class OutageSchedule:
             "groups": [group.to_dict() for group in self.groups],
         }
 
-    def get_current_event(self, group_id: str, at: datetime.datetime) -> dict:
+    def get_current_event(
+        self, group_id: str, at: datetime.datetime
+    ) -> Interval | None:
         at = at.astimezone(utc)
         for group in self.groups:
             if group.id == group_id:
                 for interval in group.intervals:
-                    if interval.startTime <= at <= interval.endTime:
-                        return interval.to_dict()
-        return {}
+                    if interval.startTime <= at and at <= interval.endTime:
+                        return interval
+        return None
 
-    def between(
+    def intersect(
         self, group_id: str, start: datetime.datetime, end: datetime.datetime
-    ) -> list[dict]:
+    ) -> list[Interval]:
         start = start.astimezone(utc)
         end = end.astimezone(utc)
         res = []
         for group in self.groups:
             if group.id == group_id:
                 for interval in group.intervals:
-                    if start <= interval.startTime and interval.endTime <= end:
-                        res.append(interval.to_dict())
+                    if interval.startTime <= end and start <= interval.endTime:
+                        res.append(interval)
         return res

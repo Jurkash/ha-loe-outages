@@ -2,13 +2,13 @@
 
 import datetime
 import logging
+import pytz
 
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.util import dt as dt_utils
 
 from .coordinator import LoeOutagesCoordinator
 from .entity import LoeOutagesEntity
@@ -50,9 +50,11 @@ class LoeOutagesCalendar(LoeOutagesEntity, CalendarEntity):
     @property
     def event(self) -> CalendarEvent | None:
         """Return the current or next upcoming event or None."""
-        now = dt_utils.now()
+        utc = pytz.UTC
+        now = datetime.datetime.now().astimezone(utc)
         LOGGER.debug("Getting current event for %s", now)
-        return self.coordinator.get_calendar_at(now)
+        res = self.coordinator.get_calendar_at(now)
+        return res
 
     async def async_get_events(
         self,

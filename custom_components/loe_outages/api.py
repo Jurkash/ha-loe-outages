@@ -4,7 +4,7 @@ import logging
 import aiohttp
 import datetime
 import pytz
-from .models import OutageSchedule
+from .models import OutageSchedule, Interval
 
 LOGGER = logging.getLogger(__name__)
 
@@ -46,15 +46,15 @@ class LoeOutagesApi:
     async def async_fetch_schedules(self) -> None:
         """Fetch outages from the JSON response."""
         if len(self.schedules) == 0:
+            LOGGER.debug("Fetching all schedules")
             schedules_data = await self.async_fetch_all_json()
             schedules = OutageSchedule.from_list(schedules_data)
             for schedule in sorted(schedules, key=lambda s: s.date):
                 self.schedules.append(schedule)
-            return
+            return None
         else:
+            LOGGER.debug("Fetching latest schedules")
             schedule_data = await self.async_fetch_latest_json()
-            schedule = OutageSchedule.from_dict(schedule_data)
-
             new_schedule = OutageSchedule.from_dict(schedule_data)
             self.schedules = [
                 item
@@ -63,38 +63,71 @@ class LoeOutagesApi:
             ]
             self.schedules.append(new_schedule)
         self.schedules.sort(key=lambda item: item.date)
+        LOGGER.debug("Saved schedules %s", list(map(lambda s: s.date, self.schedules)))
+        return None
 
-    def get_current_event(self, at: datetime) -> dict:
+    def get_current_event(self, at: datetime.datetime) -> Interval | None:
         """Get the current event."""
-        if not self.schedules:
+        if not self.schedules or len(self.schedules) == 0:
+            LOGGER.debug("No schedules found")
             return None
 
-        twoDaysBefore = datetime.datetime.now() + datetime.timedelta(days=-2)
+        at = at.astimezone(pytz.UTC)
+        twoDaysBefore = (at + datetime.timedelta(days=-2)).astimezone(pytz.UTC)
         for schedule in reversed(self.schedules):
-            if schedule.date < twoDaysBefore.astimezone(pytz.UTC):
+            LOGGER.debug("Schedule to compare: %s < %s", schedule.date, twoDaysBefore)
+            if schedule.date < twoDaysBefore:
                 return None
 
             events_at = schedule.get_current_event(self.group, at)
-            if not events_at:
-                return None
-            return events_at  # return only the first event
+            if events_at is not None:
+                LOGGER.debug("Some event was found: %s", events_at)
+                return events_at  # return only the first event
+
+        LOGGER.debug("No evets at found")
+        return None
 
     def get_events(
         self,
         start_date: datetime.datetime,
         end_date: datetime.datetime,
-    ) -> list[dict]:
+    ) -> list[Interval]:
         """Get all events."""
-        if not self.schedules:
+        if not self.schedules or len(self.schedules) == 0:
             return []
 
+        start_date = start_date.astimezone(pytz.UTC)
+        end_date = end_date.astimezone(pytz.UTC)
         result = []
-        twoDaysBeforeStart = start_date + datetime.timedelta(days=-2)
+        twoDaysBeforeStart = (start_date + datetime.timedelta(days=-2)).astimezone(
+            pytz.UTC
+        )
         for schedule in reversed(self.schedules):
             if schedule.date < twoDaysBeforeStart:
                 break
 
-            for interval in schedule.between(self.group, start_date, end_date):
+            for interval in schedule.intersect(self.group, start_date, end_date):
                 result.append(interval)
 
-        return result
+        return self._merge_intervals(sorted(result, key=lambda i: i.startTime))
+
+    def _merge_intervals(self, intervals: list[Interval]) -> list[Interval]:
+        if not intervals:
+            return []
+
+        # Start with the first interval
+        merged_intervals = [intervals[0]]
+
+        for current in intervals[1:]:
+            last = merged_intervals[-1]
+            if last.endTime == current.startTime and last.state == current.state:
+                merged_intervals[-1] = Interval(
+                    startTime=last.startTime, endTime=current.endTime, state=last.state
+                )
+            else:
+                merged_intervals.append(current)
+        [
+            LOGGER.debug("merged: from: %s, to: %s", inter.startTime, inter.endTime)
+            for inter in merged_intervals
+        ]
+        return merged_intervals

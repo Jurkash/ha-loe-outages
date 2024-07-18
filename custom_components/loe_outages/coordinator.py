@@ -58,7 +58,7 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
             STATE_ON: self.translations.get(TRANSLATION_KEY_EVENT_ON),
         }
 
-    async def update_config(
+    async def async_update_config(
         self,
         hass: HomeAssistant,  # noqa: ARG002
         config_entry: ConfigEntry,
@@ -96,12 +96,12 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
 
     def _get_next_event_of_type(self, state_type: str) -> Interval | None:
         """Get the next event of a specific type."""
-        now = dt_utils.now()
+        now = dt_utils.now().astimezone(pytz.UTC)
         # Sort events to handle multi-day spanning events correctly
         next_events = sorted(
             self.get_intervals_between(
                 now,
-                now + TIMEFRAME_TO_CHECK,
+                (now + TIMEFRAME_TO_CHECK).astimezone(pytz.UTC),
                 translate=False,
             ),
             key=lambda event: event.startTime,
@@ -122,13 +122,6 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
     @property
     def next_connectivity(self) -> datetime.datetime | None:
         """Get next connectivity time."""
-        now = dt_utils.now()
-        current_event = self.get_interval_at(now)
-        # If current event is OFF, return the end time
-        if self._event_to_state(current_event) == STATE_OFF:
-            return current_event.endTime
-
-        # Otherwise, return the next on event's end
         event = self._get_next_event_of_type(STATE_ON)
         LOGGER.debug("Next connectivity: %s", event)
         return event.startTime if event else None
@@ -136,11 +129,11 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
     @property
     def current_state(self) -> str:
         """Get the current state."""
-        now = dt_utils.now()
+        now = dt_utils.now().astimezone(pytz.UTC)
         event = self.get_interval_at(now)
         return self._event_to_state(event)
 
-    def get_interval_at(self, at: datetime.datetime) -> Interval:
+    def get_interval_at(self, at: datetime.datetime) -> Interval | None:
         """Get the current event."""
         event = self.api.get_current_event(at)
         return self._get_interval_event(event, translate=False)
@@ -160,33 +153,31 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
 
     def _get_interval_event(
         self,
-        event: dict | None,
+        interval: Interval | None,
         *,
         translate: bool = True,
     ) -> Interval:
         """Transform an event into a Inteval."""
-        if not event:
+        if not interval:
             return None
 
-        event_summary = event["state"]
-        translated_summary = self.event_name_map.get(event_summary)
-        event_start = event["startTime"]
-        event_end = event["endTime"]
+        interval_summary = interval.state
+        translated_summary = self.event_name_map.get(interval_summary)
 
         LOGGER.debug(
             "Transforming event: %s (%s -> %s)",
-            event_summary,
-            event_start,
-            event_end,
+            interval_summary,
+            interval.startTime,
+            interval.endTime,
         )
 
         return Interval(
-            state=translated_summary if translate else event_summary,
-            startTime=event_start,
-            endTime=event_end,
+            state=translated_summary if translate else interval_summary,
+            startTime=interval.startTime,
+            endTime=interval.endTime,
         )
 
-    def get_calendar_at(self, at: datetime.datetime) -> CalendarEvent:
+    def get_calendar_at(self, at: datetime.datetime) -> CalendarEvent | None:
         """Get the current event."""
         event = self.api.get_current_event(at)
         return self._get_calendar_event(event, translate=False)
@@ -206,32 +197,29 @@ class LoeOutagesCoordinator(DataUpdateCoordinator):
 
     def _get_calendar_event(
         self,
-        event: dict | None,
+        interval: Interval | None,
         *,
         translate: bool = True,
     ) -> CalendarEvent:
         """Transform an event into a Inteval."""
-        if not event:
+        if not interval:
             return None
 
-        local_tz = pytz.timezone("Europe/Kyiv")
-        event_summary = event["state"]
-        translated_summary = self.event_name_map.get(event_summary)
-        event_start = event["startTime"].astimezone(local_tz)
-        event_end = event["endTime"].astimezone(local_tz)
+        interval_summary = interval.state
+        translated_summary = self.event_name_map.get(interval_summary)
 
         LOGGER.debug(
             "Transforming event: %s (%s -> %s)",
-            event_summary,
-            event_start,
-            event_end,
+            interval_summary,
+            interval.startTime,
+            interval.endTime,
         )
 
         return CalendarEvent(
-            summary=translated_summary if translate else event_summary,
-            start=event_start,
-            end=event_end,
-            description=event_summary,
+            summary=translated_summary if translate else interval_summary,
+            start=interval.startTime,
+            end=interval.endTime,
+            description=interval_summary,
         )
 
     def _event_to_state(self, event: Interval | None) -> str:
