@@ -1,4 +1,4 @@
-![HA LOE Outages Logo](./icons/logo.svg) 
+![HA LOE Outages Logo](./icons/logo.svg)
 
 # 🔌 HA LOE Outages
 
@@ -39,11 +39,39 @@ If the button doesn't work, follow these steps to add the repository manually:
 4. Choose **Integration** as the **Category**
 5. **LOE Outages** will appear in the list of available integrations. Install it as usual.
 
+# Use cases
+
+The HA LOE Outages integration enhances Home Assistant setups by offering predictive insights into power connectivity
+
+- Simple setup for your group (or multiple one)
+- Status monitoring according to schedule
+- Predictive alerts and planning for next outages and connectivity
+- Calendar card for timely notifications, activities before or after outages.
+
+Setting up integration for your outage group:
+
+![setup_process_screenshot](assets/setup.png)
+
+Sensors available for you:
+
+![sensors_list](assets/sensors.png)
+
+Calendar card:
+
+![calendar_card](assets/calendar.png)
+
+Sample of dashboard setup:
+
+![dashboards_sample](assets/dashboard.png)
+
+By incorporating these utilities into your smart home setup, the HA LOE Outages integration not only provides outage information but also enhances the overall expiriecne of smart home.
+
 ## License
 
 MIT © [Yurii Shunkin][jurkash]
 
 <!-- Badges -->
+
 [gh-release-url]: https://github.com/jurkash/ha-loe-outages/releases/latest
 [gh-release-image]: https://img.shields.io/github/v/release/jurkash/ha-loe-outages?style=flat-square
 [gh-downloads-url]: https://github.com/jurkash/ha-loe-outages/releases
@@ -60,6 +88,7 @@ MIT © [Yurii Shunkin][jurkash]
 [twitter-image]: https://img.shields.io/badge/twitter-%40jurkashok-00ACEE.svg?style=flat-square
 
 <!-- References -->
+
 [loe]: https://poweron.loe.lviv.ua/
 [home-assistant]: https://www.home-assistant.io/
 [jurkash]: https://github.com/jurkash
