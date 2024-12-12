@@ -41,8 +41,8 @@ def build_schema(config_entry: ConfigEntry) -> vol.Schema:
                     "select": {
                         "options": [
                             {"value": f"{i}.{j}", "label": f"Group {i}.{j}"}
-                            for i in range(1, 7)  # 1-6
-                            for j in range(1, 3)  # 1-2
+                            for i in range(1, 7)  # group major 1-6
+                            for j in range(1, 3)  # group minor 1-2
                         ],
                     },
                 },
